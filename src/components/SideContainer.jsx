@@ -20,8 +20,9 @@ export default function SideContainer({
                   }`}
                   onClick={() => clickHandler(note.noteId)}
                 >
-                  {note.content.slice(0, 30) + "..."}
+                  {note.content.slice(0, 40) + "..."}
                   <div className="button-group">
+                    <button className="tag-btn">{note.tag}</button>
                     <button onClick={() => editHandler(note.noteId)}>
                       Edit
                     </button>

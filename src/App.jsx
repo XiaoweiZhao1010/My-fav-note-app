@@ -1,26 +1,37 @@
 import "./App.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CreateNote from "./components/CreateNote";
 import Header from "./components/Header";
 import SideContainer from "./components/SideContainer";
 
 function App() {
+  const predefinedTags = ["Ideas", "Personal", "Shopping", "Urgent", "Work"];
+
   const [notes, setNotes] = useState(() => {
-    try {
-      const savedNotes = localStorage.getItem("notes");
-      return savedNotes ? JSON.parse(savedNotes) : [];
-    } catch (error) {
-      console.error("Error loading notes from localStorage:", error);
-      return [];
-    }
+    const savedNotes = localStorage.getItem("notes");
+    return savedNotes ? JSON.parse(savedNotes) : [];
   });
+  const [selectedTag, setSelectedTag] = useState("");
+
+  const [activeNoteId, setActiveNoteId] = useState(null);
 
   const [newNote, setNewNote] = useState({
     noteId: null,
     title: "",
     content: "",
+    tag: selectedTag,
   });
-  const [activeNoteId, setActiveNoteId] = useState(null);
+
+  // useEffect(() => {
+  //   console.log(selectedTag);
+  // }, [selectedTag]);
+
+  const handleTagChange = (tag) => {
+    setSelectedTag(tag);
+    setNewNote((prevNote) => {
+      return { ...prevNote, tag: tag };
+    });
+  };
 
   function clickHandler(id) {
     setActiveNoteId(id);
@@ -35,26 +46,35 @@ function App() {
   };
 
   const handleSave = () => {
-    if (!newNote.title.trim() || !newNote.content.trim()) {
+    if (
+      !newNote.title.trim() ||
+      !newNote.content.trim() ||
+      !newNote.tag.trim()
+    ) {
       return;
     }
 
     let updatedNotes;
-    if (newNote.noteId > 0) {
+
+    if (newNote.noteId) {
       updatedNotes = notes.map((note) =>
-        newNote.noteId === note.noteId ? newNote : note
+        newNote.noteId === note.noteId ? { ...newNote } : note
       );
     } else {
-      updatedNotes = [...notes, { ...newNote, noteId: Date.now() }];
+      updatedNotes = [
+        ...notes,
+        { ...newNote, noteId: Date.now(), tag: selectedTag },
+      ];
     }
+
     console.log(updatedNotes);
     setNotes(updatedNotes);
-    // setActiveNoteId(updatedNotes[0].noteId);
 
     localStorage.setItem("notes", JSON.stringify(updatedNotes));
-    setNewNote({ noteId: null, title: "", content: "" });
-  };
+    setSelectedTag(newNote.tag);
 
+    setNewNote({ noteId: null, title: "", content: "", tag: "" });
+  };
   const deleteHandler = (id) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete? This action is not reversible."
@@ -68,14 +88,16 @@ function App() {
 
   const editHandler = (id) => {
     const noteToEdit = notes.find((note) => note.noteId === id);
-    // console.log(noteToEdit);
     if (noteToEdit)
       setNewNote({
         noteId: noteToEdit.noteId,
         title: noteToEdit.title,
         content: noteToEdit.content,
+        tag: noteToEdit.tag,
       });
   };
+
+  let content;
 
   return (
     <>
@@ -85,6 +107,8 @@ function App() {
           handleInputChange={handleInputChange}
           handleSave={handleSave}
           newNote={newNote}
+          handleTagChange={handleTagChange}
+          tags={predefinedTags}
         />
         <SideContainer
           notesArr={notes}
