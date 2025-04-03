@@ -5,13 +5,11 @@ import Header from "./components/Header";
 import SideContainer from "./components/SideContainer";
 
 function App() {
-  const predefinedTags = ["Ideas", "Personal", "Shopping", "Urgent", "Work"];
-
   const [notes, setNotes] = useState(() => {
     const savedNotes = localStorage.getItem("notes");
     return savedNotes ? JSON.parse(savedNotes) : [];
   });
-  const [selectedTag, setSelectedTag] = useState("");
+  const [selectedTag, setSelectedTag] = useState(null);
 
   const [activeNoteId, setActiveNoteId] = useState(null);
 
@@ -21,10 +19,13 @@ function App() {
     content: "",
     tag: selectedTag,
   });
+  const [selectedNote, setSelectedNote] = useState(null);
 
   // useEffect(() => {
-  //   console.log(selectedTag);
-  // }, [selectedTag]);
+  //   if (selectedNote) {
+  //     console.log(selectedNote);
+  //   }
+  // }, [selectedNote]);
 
   const handleTagChange = (tag) => {
     setSelectedTag(tag);
@@ -32,9 +33,15 @@ function App() {
       return { ...prevNote, tag: tag };
     });
   };
+  const filteredNotes = selectedTag
+    ? notes.filter((note) => note.tag === selectedTag)
+    : notes;
 
   function clickHandler(id) {
     setActiveNoteId(id);
+  }
+  function doubleClickHandler(note) {
+    setSelectedNote({ ...note });
   }
 
   const handleInputChange = (e) => {
@@ -66,8 +73,6 @@ function App() {
         { ...newNote, noteId: Date.now(), tag: selectedTag },
       ];
     }
-
-    console.log(updatedNotes);
     setNotes(updatedNotes);
 
     localStorage.setItem("notes", JSON.stringify(updatedNotes));
@@ -97,8 +102,6 @@ function App() {
       });
   };
 
-  let content;
-
   return (
     <>
       <Header />
@@ -108,7 +111,7 @@ function App() {
           handleSave={handleSave}
           newNote={newNote}
           handleTagChange={handleTagChange}
-          tags={predefinedTags}
+          selectedTag={selectedTag}
         />
         <SideContainer
           notesArr={notes}
@@ -116,8 +119,21 @@ function App() {
           editHandler={editHandler}
           clickHandler={clickHandler}
           activeNoteId={activeNoteId}
+          filteredNotes={filteredNotes}
+          selectedTag={selectedTag}
+          doubleClickHandler={doubleClickHandler}
         />
       </div>
+      {selectedNote && (
+        <>
+          <div className="modal-overlay"></div>
+          <div className="note-modal">
+            <h2>{selectedNote.title}</h2>
+            <p>{selectedNote.content}</p>
+            <button onClick={() => setSelectedNote(null)}>Close</button>
+          </div>
+        </>
+      )}
     </>
   );
 }

@@ -1,5 +1,6 @@
 import EmptyNoteImg from "../assets/empty-note.png";
 
+//this is also not implemented
 export default function NoNoteSelected() {
   return (
     <div>

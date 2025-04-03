@@ -1,12 +1,14 @@
 import AddIcon from "./AddIcon";
-import { useEffect } from "react";
+import Button from "./Button";
+// import PredefinedTags from "./PredefinedTags";
+// import { useEffect } from "react";
 
 export default function CreateNote({
   handleInputChange,
   handleSave,
   newNote,
-  tags,
   handleTagChange,
+  selectedTag,
 }) {
   // useEffect(()=>{
   //   console.log(selectedTag);
@@ -16,19 +18,7 @@ export default function CreateNote({
       <section className="note-container ">
         <h1 className="title">Create a Note</h1>
         <div className="tag-buttons">
-          <ul>
-            {tags.map((tag) => {
-              return (
-                <button
-                  key={tag}
-                  onClick={() => handleTagChange(tag)}
-                  className={`tag-btn ${newNote.tag === tag ? "selected" : ""}`}
-                >
-                  {tag}
-                </button>
-              );
-            })}
-          </ul>
+          <Button handleTagChange={handleTagChange} selectedTag={selectedTag} />
         </div>
         <input
           className="note-title"

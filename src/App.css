@@ -56,16 +56,16 @@ body {
   padding: 20px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   height: 600px;
-  width: 300px;
+  width: 200px;
   display: inline-block;
   flex: 1;
-  overflow-y: auto;
+  /* overflow-y: auto; */
 }
 
 .note-container {
   padding: 20px;
   height: 600px;
-  width: 600px;
+  width: 200px;
   background-color: white;
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -167,11 +167,63 @@ body {
 .note-list-item:hover {
   background-color: #aa75a596;
   transform: translateY(-2px);
+  cursor: pointer;
+  user-select: none;
 }
 
 .note-list-item.active {
   background-color: #aa75a596;
   border-left: 3px solid rgb(132, 99, 99);
+}
+.note-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+  z-index: 999;
+}
+.note-modal h2 {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.note-modal p {
+  font-size: 1rem;
+  margin-bottom: 20px;
+  color: #555;
+}
+
+.note-modal button {
+  /* margin-left: 150px; */
+  padding: 10px 20px;
+  background-color: #505d6b;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin: 0 left;
+  display: block;
+}
+
+.note-modal button:hover {
+  background-color: #0056b3;
 }
 
 .button-group {
@@ -204,20 +256,6 @@ button {
   border-radius: 30px;
   font-weight: 500;
 }
-
-/* button:hover {
-  background-color: royalblue;
-}
-
-button:nth-child(2) {
-  /* Delete button */
-/* background-color: lightpink;
-} */
-
-/* button:nth-child(2):hover {
-  background-color: darkred;
-} */
-/* */
 .tag-buttons {
   display: flex;
   gap: 10px;
