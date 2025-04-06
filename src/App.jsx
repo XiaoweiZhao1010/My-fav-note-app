@@ -10,7 +10,6 @@ function App() {
     return savedNotes ? JSON.parse(savedNotes) : [];
   });
   const [selectedTag, setSelectedTag] = useState(null);
-
   const [activeNoteId, setActiveNoteId] = useState(null);
 
   const [newNote, setNewNote] = useState({
@@ -20,12 +19,14 @@ function App() {
     tag: selectedTag,
   });
   const [selectedNote, setSelectedNote] = useState(null);
-
-  // useEffect(() => {
-  //   if (selectedNote) {
-  //     console.log(selectedNote);
-  //   }
-  // }, [selectedNote]);
+  useEffect(() => {
+    if (selectedNote) {
+      console.log(selectedNote);
+    }
+  }, [selectedNote]);
+  const filteredNotes = selectedTag
+    ? notes.filter((note) => note.tag === selectedTag)
+    : notes;
 
   const handleTagChange = (tag) => {
     setSelectedTag(tag);
@@ -33,9 +34,6 @@ function App() {
       return { ...prevNote, tag: tag };
     });
   };
-  const filteredNotes = selectedTag
-    ? notes.filter((note) => note.tag === selectedTag)
-    : notes;
 
   function clickHandler(id) {
     setActiveNoteId(id);
@@ -50,6 +48,18 @@ function App() {
       ...prev,
       [name]: value,
     }));
+  };
+  const editHandler = (id) => {
+    const noteToEdit = notes.find((note) => note.noteId === id);
+    if (noteToEdit) {
+      setNewNote({
+        noteId: noteToEdit.noteId,
+        title: noteToEdit.title,
+        content: noteToEdit.content,
+        tag: noteToEdit.tag,
+      });
+      setSelectedTag(noteToEdit.tag);
+    }
   };
 
   const handleSave = () => {
@@ -76,10 +86,10 @@ function App() {
     setNotes(updatedNotes);
 
     localStorage.setItem("notes", JSON.stringify(updatedNotes));
-    setSelectedTag(newNote.tag);
-
+    setSelectedTag("");
     setNewNote({ noteId: null, title: "", content: "", tag: "" });
   };
+
   const deleteHandler = (id) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete? This action is not reversible."
@@ -87,19 +97,9 @@ function App() {
     if (!confirmDelete) return;
 
     const updatedNotes = notes.filter((note) => note.noteId !== id);
+
     setNotes(updatedNotes);
     localStorage.setItem("notes", JSON.stringify(updatedNotes));
-  };
-
-  const editHandler = (id) => {
-    const noteToEdit = notes.find((note) => note.noteId === id);
-    if (noteToEdit)
-      setNewNote({
-        noteId: noteToEdit.noteId,
-        title: noteToEdit.title,
-        content: noteToEdit.content,
-        tag: noteToEdit.tag,
-      });
   };
 
   return (
