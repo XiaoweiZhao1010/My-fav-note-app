@@ -3,8 +3,13 @@ import { useState, useEffect } from "react";
 import CreateNote from "./components/CreateNote";
 import Header from "./components/Header";
 import SideContainer from "./components/SideContainer";
+import AuthForm from "./components/AuthForm";
 
 function App() {
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem("currentUser");
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
   const [notes, setNotes] = useState(() => {
     const savedNotes = localStorage.getItem("notes");
     return savedNotes ? JSON.parse(savedNotes) : [];
@@ -24,6 +29,16 @@ function App() {
       console.log(selectedNote);
     }
   }, [selectedNote]);
+
+  //Load notes when user logs in or changes
+  useEffect(() => {
+    if (user) {
+      const savedNotes = localStorage.getItem(`notes-${user.uid}`);
+      setNotes(savedNotes ? JSON.parse(savedNotes) : []);
+    } else {
+      setNotes([]);
+    }
+  }, [user]);
   const filteredNotes = selectedTag
     ? notes.filter((note) => note.tag === selectedTag)
     : notes;
@@ -85,7 +100,7 @@ function App() {
     }
     setNotes(updatedNotes);
 
-    localStorage.setItem("notes", JSON.stringify(updatedNotes));
+    localStorage.setItem(`notes-${user.uid}`, JSON.stringify(updatedNotes));
     setSelectedTag("");
     setNewNote({ noteId: null, title: "", content: "", tag: "" });
   };
@@ -99,12 +114,45 @@ function App() {
     const updatedNotes = notes.filter((note) => note.noteId !== id);
 
     setNotes(updatedNotes);
-    localStorage.setItem("notes", JSON.stringify(updatedNotes));
+    localStorage.setItem(`notes-${user.uid}`, JSON.stringify(updatedNotes));
   };
+  const handleLogout = () => {
+    localStorage.removeItem("currentUser");
+    // localStorage.removeItem(`notes-${user.uid}`);
+    setUser(null);
+    // setNotes([]);
+  };
+  if (!user) {
+    return <AuthForm onLogin={setUser} />;
+  }
 
   return (
     <>
       <Header />
+      <button
+        onClick={handleLogout}
+        style={{
+          position: "fixed",
+          top: "5px",
+          right: "10px",
+          padding: "10px 20px",
+          backgroundColor: "#d1d5db",
+          color: "#fff",
+          border: "none",
+          borderRadius: "5px",
+          fontSize: "16px",
+          cursor: "pointer",
+          transition: "all 0.3s ease",
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.backgroundColor = "rgb(173, 78, 91)";
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.backgroundColor = "#d1d5db";
+        }}
+      >
+        Log Out
+      </button>
       <div className="app-container">
         <CreateNote
           handleInputChange={handleInputChange}
