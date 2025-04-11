@@ -8,12 +8,14 @@ import AuthForm from "./components/AuthForm";
 function App() {
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("currentUser");
-    return savedUser ? JSON.parse(savedUser) : null;
+    try {
+      const parsed = JSON.parse(savedUser);
+      return parsed && typeof parsed === "object" ? parsed : null;
+    } catch (e) {
+      return null;
+    }
   });
-  const [notes, setNotes] = useState(() => {
-    const savedNotes = localStorage.getItem("notes");
-    return savedNotes ? JSON.parse(savedNotes) : [];
-  });
+  const [notes, setNotes] = useState();
   const [selectedTag, setSelectedTag] = useState(null);
   const [activeNoteId, setActiveNoteId] = useState(null);
 
