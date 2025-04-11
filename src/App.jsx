@@ -3,16 +3,18 @@ import { useState, useEffect } from "react";
 import CreateNote from "./components/CreateNote";
 import Header from "./components/Header";
 import SideContainer from "./components/SideContainer";
+import AuthForm from "./components/AuthForm";
 
 function App() {
-  const predefinedTags = ["Ideas", "Personal", "Shopping", "Urgent", "Work"];
-
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem("currentUser");
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
   const [notes, setNotes] = useState(() => {
     const savedNotes = localStorage.getItem("notes");
     return savedNotes ? JSON.parse(savedNotes) : [];
   });
-  const [selectedTag, setSelectedTag] = useState("");
-
+  const [selectedTag, setSelectedTag] = useState(null);
   const [activeNoteId, setActiveNoteId] = useState(null);
 
   const [newNote, setNewNote] = useState({
@@ -21,10 +23,25 @@ function App() {
     content: "",
     tag: selectedTag,
   });
+  const [selectedNote, setSelectedNote] = useState(null);
+  useEffect(() => {
+    if (selectedNote) {
+      console.log(selectedNote);
+    }
+  }, [selectedNote]);
 
-  // useEffect(() => {
-  //   console.log(selectedTag);
-  // }, [selectedTag]);
+  //Load notes when user logs in or changes
+  useEffect(() => {
+    if (user) {
+      const savedNotes = localStorage.getItem(`notes-${user.uid}`);
+      setNotes(savedNotes ? JSON.parse(savedNotes) : []);
+    } else {
+      setNotes([]);
+    }
+  }, [user]);
+  const filteredNotes = selectedTag
+    ? notes.filter((note) => note.tag === selectedTag)
+    : notes;
 
   const handleTagChange = (tag) => {
     setSelectedTag(tag);
@@ -36,6 +53,9 @@ function App() {
   function clickHandler(id) {
     setActiveNoteId(id);
   }
+  function doubleClickHandler(note) {
+    setSelectedNote({ ...note });
+  }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -43,6 +63,18 @@ function App() {
       ...prev,
       [name]: value,
     }));
+  };
+  const editHandler = (id) => {
+    const noteToEdit = notes.find((note) => note.noteId === id);
+    if (noteToEdit) {
+      setNewNote({
+        noteId: noteToEdit.noteId,
+        title: noteToEdit.title,
+        content: noteToEdit.content,
+        tag: noteToEdit.tag,
+      });
+      setSelectedTag(noteToEdit.tag);
+    }
   };
 
   const handleSave = () => {
@@ -66,15 +98,13 @@ function App() {
         { ...newNote, noteId: Date.now(), tag: selectedTag },
       ];
     }
-
-    console.log(updatedNotes);
     setNotes(updatedNotes);
 
-    localStorage.setItem("notes", JSON.stringify(updatedNotes));
-    setSelectedTag(newNote.tag);
-
+    localStorage.setItem(`notes-${user.uid}`, JSON.stringify(updatedNotes));
+    setSelectedTag("");
     setNewNote({ noteId: null, title: "", content: "", tag: "" });
   };
+
   const deleteHandler = (id) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete? This action is not reversible."
@@ -82,33 +112,54 @@ function App() {
     if (!confirmDelete) return;
 
     const updatedNotes = notes.filter((note) => note.noteId !== id);
+
     setNotes(updatedNotes);
-    localStorage.setItem("notes", JSON.stringify(updatedNotes));
+    localStorage.setItem(`notes-${user.uid}`, JSON.stringify(updatedNotes));
   };
-
-  const editHandler = (id) => {
-    const noteToEdit = notes.find((note) => note.noteId === id);
-    if (noteToEdit)
-      setNewNote({
-        noteId: noteToEdit.noteId,
-        title: noteToEdit.title,
-        content: noteToEdit.content,
-        tag: noteToEdit.tag,
-      });
+  const handleLogout = () => {
+    localStorage.removeItem("currentUser");
+    // localStorage.removeItem(`notes-${user.uid}`);
+    setUser(null);
+    // setNotes([]);
   };
-
-  let content;
+  if (!user) {
+    return <AuthForm onLogin={setUser} />;
+  }
 
   return (
     <>
       <Header />
+      <button
+        onClick={handleLogout}
+        style={{
+          position: "fixed",
+          top: "5px",
+          right: "10px",
+          padding: "10px 20px",
+          backgroundColor: "#d1d5db",
+          color: "#fff",
+          border: "none",
+          borderRadius: "5px",
+          fontSize: "16px",
+          cursor: "pointer",
+          transition: "all 0.3s ease",
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.backgroundColor = "rgb(173, 78, 91)";
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.backgroundColor = "#d1d5db";
+        }}
+      >
+        Log Out
+      </button>
       <div className="app-container">
         <CreateNote
           handleInputChange={handleInputChange}
           handleSave={handleSave}
           newNote={newNote}
           handleTagChange={handleTagChange}
-          tags={predefinedTags}
+          selectedTag={selectedTag}
         />
         <SideContainer
           notesArr={notes}
@@ -116,8 +167,21 @@ function App() {
           editHandler={editHandler}
           clickHandler={clickHandler}
           activeNoteId={activeNoteId}
+          filteredNotes={filteredNotes}
+          selectedTag={selectedTag}
+          doubleClickHandler={doubleClickHandler}
         />
       </div>
+      {selectedNote && (
+        <>
+          <div className="modal-overlay"></div>
+          <div className="note-modal">
+            <h2>{selectedNote.title}</h2>
+            <p>{selectedNote.content}</p>
+            <button onClick={() => setSelectedNote(null)}>Close</button>
+          </div>
+        </>
+      )}
     </>
   );
 }
