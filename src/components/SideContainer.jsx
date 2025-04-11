@@ -12,7 +12,7 @@ export default function SideContainer({
         Notes
       </h2>
       <ul>
-        {filteredNotes.length > 0 ? (
+        {filteredNotes?.length > 0 ? (
           filteredNotes
             ?.sort((a, b) => b.noteId - a.noteId)
             .map((note) => (
