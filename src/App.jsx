@@ -4,10 +4,11 @@ import CreateNote from "./components/CreateNote";
 import Header from "./components/Header";
 import SideContainer from "./components/SideContainer";
 import AuthForm from "./components/AuthForm";
+import axios from "./utils/axios";
 
 function App() {
   const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem("currentUser");
+    const savedUser = sessionStorage.getItem("currentUser");
     try {
       const parsed = JSON.parse(savedUser);
       return parsed && typeof parsed === "object" ? parsed : null;
@@ -20,7 +21,7 @@ function App() {
   const [activeNoteId, setActiveNoteId] = useState(null);
 
   const [newNote, setNewNote] = useState({
-    noteId: null,
+    id: null,
     title: "",
     content: "",
     tag: selectedTag,
@@ -35,12 +36,19 @@ function App() {
   //Load notes when user logs in or changes
   useEffect(() => {
     if (user) {
-      const savedNotes = localStorage.getItem(`notes-${user.uid}`);
-      setNotes(savedNotes ? JSON.parse(savedNotes) : []);
+      axios
+        .get("/notes")
+        .then((res) => {
+          setNotes(res.data);
+        })
+        .catch((err) => {
+          console.error("Error fetching notes:", err);
+        });
     } else {
       setNotes([]);
     }
   }, [user]);
+
   const filteredNotes = selectedTag
     ? notes.filter((note) => note.tag === selectedTag)
     : notes;
@@ -67,10 +75,10 @@ function App() {
     }));
   };
   const editHandler = (id) => {
-    const noteToEdit = notes.find((note) => note.noteId === id);
+    const noteToEdit = notes.find((note) => note.id === id);
     if (noteToEdit) {
       setNewNote({
-        noteId: noteToEdit.noteId,
+        id: noteToEdit.id,
         title: noteToEdit.title,
         content: noteToEdit.content,
         tag: noteToEdit.tag,
@@ -83,28 +91,47 @@ function App() {
     if (
       !newNote.title.trim() ||
       !newNote.content.trim() ||
-      !newNote.tag.trim()
+      !newNote?.tag.trim()
     ) {
       return;
     }
 
-    let updatedNotes;
-
-    if (newNote.noteId) {
-      updatedNotes = notes.map((note) =>
-        newNote.noteId === note.noteId ? { ...newNote } : note
-      );
+    if (newNote.id) {
+      axios
+        .put(`/notes/${newNote.id}`, {
+          title: newNote.title,
+          content: newNote.content,
+          tag: newNote.tag,
+        })
+        .then((res) => {
+          const updatedNotes = notes.map((note) =>
+            note.id === newNote.id ? res.data : note
+          );
+          setNotes(updatedNotes);
+          //reset newNote
+          setNewNote({ id: null, title: "", content: "", tag: "" });
+          setSelectedTag("");
+        })
+        .catch((err) => {
+          console.error("Error updating note:", err);
+        });
     } else {
-      updatedNotes = [
-        ...notes,
-        { ...newNote, noteId: Date.now(), tag: selectedTag },
-      ];
+      axios
+        .post("/notes", {
+          title: newNote.title,
+          content: newNote.content,
+          tag: newNote.tag,
+        })
+        .then((res) => {
+          setNotes([...notes, res.data]);
+          //reset newNote
+          setNewNote({ title: "", content: "", tag: "" });
+          setSelectedTag("");
+        })
+        .catch((err) => {
+          console.error("Error creating note:", err);
+        });
     }
-    setNotes(updatedNotes);
-
-    localStorage.setItem(`notes-${user.uid}`, JSON.stringify(updatedNotes));
-    setSelectedTag("");
-    setNewNote({ noteId: null, title: "", content: "", tag: "" });
   };
 
   const deleteHandler = (id) => {
@@ -113,16 +140,19 @@ function App() {
     );
     if (!confirmDelete) return;
 
-    const updatedNotes = notes.filter((note) => note.noteId !== id);
-
-    setNotes(updatedNotes);
-    localStorage.setItem(`notes-${user.uid}`, JSON.stringify(updatedNotes));
+    axios
+      .delete(`/notes/${id}`)
+      .then(() => {
+        const updatedNotes = notes.filter((note) => note.id !== id);
+        setNotes(updatedNotes);
+      })
+      .catch((err) => {
+        console.error("Error deleting note:", err);
+      });
   };
   const handleLogout = () => {
-    localStorage.removeItem("currentUser");
-    // localStorage.removeItem(`notes-${user.uid}`);
+    sessionStorage.removeItem("currentUser");
     setUser(null);
-    // setNotes([]);
   };
   if (!user) {
     return <AuthForm onLogin={setUser} />;

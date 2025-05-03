@@ -4,8 +4,8 @@ const cors = require("cors");
 require("dotenv").config();
 
 const pool = require("./db"); // Import the database connection pool
-const authRoutes = require("./authRoutes"); // Import your auth routes
-const noteRoutes = require("./noteRoutes"); // Import your note routes
+const authRoutes = require("./routes/authRoutes"); // Import your auth routes
+const noteRoutes = require("./routes/noteRoutes"); // Import your note routes
 
 pool
   .connect()

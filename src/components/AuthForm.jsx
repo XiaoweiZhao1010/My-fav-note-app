@@ -1,4 +1,6 @@
 import { useState } from "react";
+import axios from "../utils/axios";
+
 export default function AuthForm({ onLogin }) {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
@@ -14,56 +16,33 @@ export default function AuthForm({ onLogin }) {
     }));
     return;
   };
-  const handleAuth = (e) => {
+  const handleAuth = async (e) => {
     e.preventDefault();
-    const users = JSON.parse(localStorage.getItem("users") || "[]");
 
-    if (!email) {
-      setError("email", "Email is required");
-      return;
-    }
-    if (!password) {
-      setError("password", "Password is required");
-      return;
-    }
-
-    if (isSignUp) {
-      const userExists = users.find((user) => user.email === email);
-      if (userExists) {
-        setError("email", "User already exists");
-        return;
-      }
-      if (password?.length < 6) {
-        setError("password", "Password must be at least 6 characters long");
-        return;
-      }
-      if (!/\S+@\S+\.\S+/.test(email)) {
-        setError("email", "Please enter a valid email address");
-        return;
-      }
-      if (password === email) {
-        setError("password", "Password cannot be the same as email");
-        return;
-      }
-      if (password.includes(" ")) {
-        setError("password", "Password cannot contain spaces");
-        return;
-      }
-
-      const newUser = { email, password, uid: Date.now().toString() };
-      localStorage.setItem("users", JSON.stringify([...users, newUser]));
-      localStorage.setItem("currentUser", JSON.stringify(newUser));
-      onLogin(newUser);
-    } else {
-      const user = users.find(
-        (u) => u.email === email && u.password === password
-      );
-      if (!user) {
-        setError("email", "Invalid credentials");
-        return;
-      }
-      localStorage.setItem("currentUser", JSON.stringify(user));
+    try {
+      const endpoint = isSignUp ? "/auth/register" : "/auth/login";
+      const response = await axios.post(endpoint, {
+        email,
+        password,
+      });
+      const token = response.data.token; // Get the JWT token from the response
+      // Store the token in sessionStorage
+      sessionStorage.setItem("jwtToken", token);
+      console.log("Logged in successfully");
+      const user = { email }; // Assuming the user data is returned in the response
+      sessionStorage.setItem("currentUser", JSON.stringify(user));
       onLogin(user);
+    } catch (error) {
+      console.error("Error during authentication", error);
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        setError("email", error.response.data.message);
+      } else {
+        setError("email", "An error occurred. Please try again.");
+      }
     }
   };
 
@@ -102,6 +81,7 @@ export default function AuthForm({ onLogin }) {
           {isSignUp ? "Sign Up" : "Sign In"}
         </h2>
         <input
+          autoFocus
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
