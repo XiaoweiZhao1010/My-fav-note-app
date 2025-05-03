@@ -125,7 +125,7 @@ function App() {
         .then((res) => {
           setNotes([...notes, res.data]);
           //reset newNote
-          setNewNote({ title: "", content: "", tag: "" });
+          setNewNote({ id: null, title: "", content: "", tag: "" });
           setSelectedTag("");
         })
         .catch((err) => {
