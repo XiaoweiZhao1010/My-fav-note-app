@@ -1,3 +1,11 @@
+:root {
+  font-size: 16px; /* Base font size: 1rem = 16px */
+  --primary-color: #007bff;
+  --secondary-color: #e8e2e896;
+  --text-color: #333;
+  --background-color: #fff;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -5,11 +13,12 @@
   font-family: Arial, sans-serif;
   position: relative;
 }
+
 img {
   pointer-events: none;
   background-color: #ffffff00;
-  width: 30px; /* Increased width for better visibility */
-  height: 30px;
+  width: 2rem;
+  height: 2rem;
 }
 
 .header {
@@ -20,205 +29,161 @@ img {
   justify-content: center;
   color: rgba(6, 6, 6, 0.624);
   opacity: 1;
-  margin-top: 50px;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-@media screen and (max-width: 500px) {
-  body {
-    font-size: 10px;
-    color: #333;
-    line-height: 1.6;
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
-  }
+  margin-top: 3rem;
+  border-radius: 0.625rem;
+  box-shadow: 0 0.125rem 0.625rem rgba(0, 0, 0, 0.1);
+  font-size: 1.5rem;
 }
 
 body {
   background-color: rgb(241, 236, 236);
+  overflow: hidden;
 }
+
 .app-container {
   display: flex;
-  flex-direction: row; /* Ensure horizontal layout */
-  align-items: flex-start; /* Align items at the top */
+  flex-direction: row;
+  align-items: flex-start;
   min-height: 100vh;
-  padding: 20px;
-  gap: 20px;
-  width: 100%;
+  padding: 1.25rem;
+  gap: 1.25rem;
+  flex-wrap: wrap;
 }
 
-.notes-sidebar {
-  grid-area: notesSidebar;
-  background-color: white;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  height: 600px;
-  width: 200px;
-  display: inline-block;
-  flex: 1;
-  /* overflow-y: auto; */
-}
-
+.notes-sidebar,
 .note-container {
-  padding: 20px;
-  height: 600px;
-  width: 200px;
   background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 0.625rem;
+  padding: 1.25rem;
+  box-shadow: 0 0.125rem 0.625rem rgba(0, 0, 0, 0.1);
+  height: 75vh;
+  width: 25vw;
+  min-width: 200px;
   flex: 1;
 }
 
 .title {
-  text-shadow: 1px 1px 2px rgba(225, 9, 9, 0.05);
+  text-shadow: 0.0625rem 0.0625rem 0.125rem rgba(225, 9, 9, 0.05);
   animation: fadeIn 0.6s ease-in-out;
 }
 
 .note-title {
-  font-size: 15px;
-  margin-bottom: 15px;
+  font-size: 1rem;
+  margin-bottom: 1rem;
   color: #333;
-  border-radius: 5px;
+  border-radius: 0.3125rem;
   background-color: #fff;
-  box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 0.0625rem 0.3125rem rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease;
   border: 1px solid #ddd;
-  display: inline-block;
-  height: 50px;
-  width: calc(98% - 60px); /* Leave space for button */
-  padding: 10px;
-  margin-right: 10px;
-}
-.note-title .tag-input .note-textarea:focus {
-  border-color: #007bff;
-  outline: none;
-  box-shadow: inset 0 1px 5px rgba(0, 123, 255, 0.3);
+  height: 3rem;
+  width: calc(98% - 3.75rem);
+  padding: 0.625rem;
+  margin-right: 0.625rem;
 }
 
-/* Textarea styles */
 .note-textarea {
-  font-size: 15px;
+  font-size: 1rem;
   width: 100%;
-  height: 400px;
-  padding: 10px;
+  height: 25vh;
+  padding: 0.625rem;
   border: 1px solid #ddd;
-  border-radius: 5px;
-  resize: none; /* Disable resizing */
+  border-radius: 0.3125rem;
+  resize: none;
   background-color: #fff;
   color: #333;
-  box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.05);
-  margin-bottom: 20px;
+  box-shadow: inset 0 0.0625rem 0.3125rem rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.25rem;
   transition: all 0.2s ease;
 }
-
 .save-btn {
-  position: absolute;
-  right: 20px; /* Align with container padding */
-  top: 112px; /* Align with container padding */
-  margin-bottom: 10px;
-  width: 50px;
-  height: 50px;
-  background-color: #e8e2e896; /* Original background color */
-  color: rgb(132, 99, 99);
-  border-radius: 10px; /* Slightly more rounded corners for a softer look */
+  position: static;
+  width: 3.125rem; /* 50px */
+  height: 3.125rem; /* 50px */
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+  border-radius: 0.625rem; /* 10px */
   cursor: pointer;
-  transition: all 0.3s ease; /* Smooth transition for background and transform */
-  border: none; /* Remove border for a cleaner look */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-  display: inline-block; /* Make the button a block element */
+  transition: all 0.3s ease;
+  border: none;
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+  display: inline-block;
 }
 
 /* Hover effect */
 .save-btn:hover {
-  background-color: #aa75a596; /* Slightly darker shade */
-  transform: translateY(-3px); /* Slight lift effect */
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+  background-color: #aa75a596;
+  transform: translateY(0.3rem); /* -3px */
+  box-shadow: 0 0.375rem 0.75rem rgba(0, 0, 0, 0.2); /* 6px 12px */
 }
 
 /* Active effect */
 .save-btn:active {
-  background-color: #a88134; /* Your chosen active color */
-  transform: translateY(1px); /* Button presses down */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Reduced shadow on active */
+  background-color: #a88134;
+  transform: translateY(0.5rem); /* 1px */
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1); /* 2px 4px */
 }
 
 /* Focus effect */
 .save-btn:focus {
-  outline: none; /* Remove default outline */
-  border: 2px solid #a88134; /* Add a border on focus */
+  outline: none;
+  border: 0.125rem solid #a88134; /* 2px */
 }
 
-/* Add styles for notes in sidebar */
 .note-list-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
-  margin-bottom: 10px;
+  padding: 0.625rem;
+  margin-bottom: 0.625rem;
   background-color: #e8e2e896;
-  border-radius: 5px;
+  border-radius: 0.3125rem;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
-.note-list-item:hover {
-  background-color: #aa75a596;
-  transform: translateY(-2px);
-  cursor: pointer;
-  user-select: none;
-}
-
+.note-list-item:hover,
 .note-list-item.active {
   background-color: #aa75a596;
-  border-left: 3px solid rgb(132, 99, 99);
+  transform: translateY(-0.125rem);
+  border-left: 0.1875rem solid rgb(132, 99, 99);
 }
+
 .note-modal {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   background: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 1.25rem;
+  border-radius: 0.625rem;
+  box-shadow: 0 0.25rem 0.375rem rgba(0, 0, 0, 0.1);
   z-index: 1000;
+  width: 80vw;
+  max-width: 500px;
 }
 
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
-  z-index: 999;
-}
 .note-modal h2 {
   font-size: 1.25rem;
   font-weight: bold;
-  margin-bottom: 10px;
+  margin-bottom: 0.625rem;
   color: #333;
 }
 
 .note-modal p {
   font-size: 1rem;
-  margin-bottom: 20px;
+  margin-bottom: 1.25rem;
   color: #555;
 }
 
 .note-modal button {
-  /* margin-left: 150px; */
-  padding: 10px 20px;
+  padding: 0.625rem 1.25rem;
   background-color: #505d6b;
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 0.3125rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  margin: 0 left;
   display: block;
 }
 
@@ -228,49 +193,52 @@ body {
 
 .button-group {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
 }
 
 .tag-input {
-  font-size: 15px;
-  width: 300px;
-  height: 40px;
-  padding: 5px;
-  border: 1px solid #d1d5db; /* border-gray-300 */
-  border-radius: 5px;
-  /* resize: none; */
+  font-size: 1rem;
+  width: 18.75rem;
+  height: 2.5rem;
+  padding: 0.3125rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.3125rem;
   background-color: white;
-  color: #374151; /* text-gray-800 */
-  box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.05);
-  margin: 10px 0; /* Equivalent to my-[50px] */
+  color: #374151;
+  box-shadow: inset 0 0.0625rem 0.3125rem rgba(0, 0, 0, 0.05);
+  margin: 0.625rem 0;
   transition: all 0.2s ease-in-out;
   display: block;
 }
 
 button {
-  padding: 5px 10px;
+  padding: 0.3125rem 0.625rem;
   border: none;
   background-color: lightblue;
   color: white;
   cursor: pointer;
-  border-radius: 30px;
+  border-radius: 1.875rem;
   font-weight: 500;
 }
+
 .tag-buttons {
   display: flex;
-  gap: 10px;
-  margin-top: 10px;
-  margin-bottom: 16px;
+  gap: 0.625rem;
+  margin-top: 0.625rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  justify-content: left;
 }
 
 .tag-btn {
   background-color: rgb(244, 206, 253);
-  padding: 5px 10px;
-  border-radius: 10px;
+  padding: 0.3125rem 0.625rem;
+  border-radius: 0.625rem;
   border: 1px solid #ccc;
   color: black;
   cursor: pointer;
-  margin-left: 5px;
+  margin-left: 0.3125rem;
+  font-size: 0.875rem;
 }
 
 .tag-btn:active {
@@ -281,21 +249,82 @@ button {
 .tag-btn:hover {
   background-color: #d7afaf;
 }
+
 .tag-btn.selected {
-  background-color: #007bff;
+  background-color: var(--primary-color);
   color: white;
-  border-color: #007bff;
+  border-color: var(--primary-color);
 }
-.editing-note {
-  animation: fadeIn 0.6s ease-in-out;
-}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-4px);
+    transform: translateY(-0.25rem);
   }
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Media Queries */
+@media screen and (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0.625rem;
+  }
+
+  .notes-sidebar,
+  .note-container {
+    width: 100%;
+    height: auto;
+    padding: 0.75rem;
+  }
+
+  .note-title,
+  .note-textarea,
+  .tag-input {
+    width: 100%;
+    font-size: 1rem;
+  }
+
+  .save-btn {
+    width: 100%;
+    max-width: 18.75rem;
+    height: 2.8125rem;
+    font-size: 1rem;
+    margin: 1.25rem auto;
+    display: block;
+  }
+
+  .header {
+    font-size: 1.5rem;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  img {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .header {
+    font-size: 1.2rem;
+  }
+
+  .tag-btn {
+    font-size: 0.75rem;
+  }
+
+  .save-btn {
+    font-size: 0.875rem;
+    height: 2.5rem;
+  }
+
+  .note-textarea {
+    height: 6.25rem;
   }
 }
