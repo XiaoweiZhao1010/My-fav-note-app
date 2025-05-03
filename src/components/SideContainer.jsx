@@ -14,21 +14,21 @@ export default function SideContainer({
       <ul>
         {filteredNotes?.length > 0 ? (
           filteredNotes
-            ?.sort((a, b) => b.noteId - a.noteId)
-            .map((note) => (
+            ?.sort((a, b) => b.id - a.id)
+            .map((note, index) => (
               <li
                 className={`note-list-item ${
-                  activeNoteId === note.noteId ? "active" : ""
+                  activeNoteId === note.id ? "active" : ""
                 }`}
-                onClick={() => clickHandler(note.noteId)}
+                onClick={() => clickHandler(note.id)}
                 onDoubleClick={() => doubleClickHandler(note)}
-                key={note.noteId}
+                key={note.id || `note-${index}`}
               >
                 {note.content.slice(0, 40) + "..."}
                 <div className="button-group">
                   <button className="tag-btn">{note.tag}</button>
-                  <button onClick={() => editHandler(note.noteId)}>Edit</button>
-                  <button onClick={() => deleteHandler(note.noteId)}>X</button>
+                  <button onClick={() => editHandler(note.id)}>Edit</button>
+                  <button onClick={() => deleteHandler(note.id)}>X</button>
                 </div>
               </li>
             ))

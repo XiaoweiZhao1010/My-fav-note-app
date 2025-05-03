@@ -10,7 +10,7 @@ export default function CreateNote({
   handleTagChange,
   selectedTag,
 }) {
-  const isEditing = newNote.noteId !== null;
+  const isEditing = newNote.id !== null;
 
   // useEffect(()=>{
   //   console.log(selectedTag);
@@ -33,6 +33,7 @@ export default function CreateNote({
           <Button handleTagChange={handleTagChange} selectedTag={selectedTag} />
         </div>
         <input
+          autoFocus
           className="note-title"
           type="text"
           name="title"
