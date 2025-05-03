@@ -1,5 +1,7 @@
 # My Final Project for CS50
 
+## Video Demo: https://youtu.be/Mn6sSfV-dfw
+
 ## Project Title: My Fav Note App
 
 ### Description
