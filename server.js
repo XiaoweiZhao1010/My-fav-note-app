@@ -21,7 +21,13 @@ app.use(express.json()); // Allows JSON in requests
 app.use(express.static(path.join(__dirname, "client/build")));
 app.use("/api/auth", authRoutes); // Use the auth routes
 app.use("/api/notes", noteRoutes); // Use the note routes
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "client/build")));
 
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "client/build", "index.html"));
+  });
+}
 app.get("/", (req, res) => {
   res.send("Hello from your Note App backend!");
 });
