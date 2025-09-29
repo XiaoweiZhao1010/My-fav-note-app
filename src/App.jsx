@@ -1,237 +1,123 @@
-import "./App.css";
-import { useState, useEffect } from "react";
-import CreateNote from "./components/CreateNote";
+// import "./styles/App.css";
+import "./styles/header.css";
+import { useReducer } from "react";
+import { useAuth } from "./hooks/useAuth";
+import { useNotes } from "./hooks/useNotes";
 import Header from "./components/Header";
-import SideContainer from "./components/SideContainer";
-import AuthForm from "./components/AuthForm";
-import axios from "./utils/axios";
+import SearchBar from "./components/SearchBar";
+import Button from "./ui/Button";
+import Notes from "./components/Notes";
+import Footer from "./components/Footer";
+import CreateNote from "./components/CreateNote";
 
-function App() {
-  const [user, setUser] = useState(() => {
-    const savedUser = sessionStorage.getItem("currentUser");
-    try {
-      const parsed = JSON.parse(savedUser);
-      return parsed && typeof parsed === "object" ? parsed : null;
-    } catch (e) {
-      return null;
-    }
-  });
-  const [notes, setNotes] = useState();
-  const [selectedTag, setSelectedTag] = useState(null);
-  const [activeNoteId, setActiveNoteId] = useState(null);
+export default function App() {
+  const [activeTab, setActiveTab] = useReducer((_, action) => action, "notes");
+  const [searchText, setSearchText] = useReducer((_, action) => action, "");
+  const [showSuggestions, setShowSuggestions] = useReducer(
+    (_, action) => action,
+    false
+  );
+  const { user, login, logout } = useAuth();
+  const notesState = useNotes(user);
 
-  const [newNote, setNewNote] = useState({
-    id: null,
-    title: "",
-    content: "",
-    tag: selectedTag,
-  });
-  const [selectedNote, setSelectedNote] = useState(null);
-  useEffect(() => {
-    if (selectedNote) {
-      console.log(selectedNote);
-    }
-  }, [selectedNote]);
-
-  //Load notes when user logs in or changes
-  useEffect(() => {
-    if (user) {
-      axios
-        .get("/notes")
-        .then((res) => {
-          setNotes(res.data);
-        })
-        .catch((err) => {
-          console.error("Error fetching notes:", err);
-        });
-    } else {
-      setNotes([]);
-    }
-  }, [user]);
-
-  const filteredNotes = selectedTag
-    ? notes.filter((note) => note.tag === selectedTag)
-    : notes;
-
-  const handleTagChange = (tag) => {
-    setSelectedTag(tag);
-    setNewNote((prevNote) => {
-      return { ...prevNote, tag: tag };
-    });
-  };
-
-  function clickHandler(id) {
-    setActiveNoteId(id);
-  }
-  function doubleClickHandler(note) {
-    setSelectedNote({ ...note });
-  }
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewNote((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-  const editHandler = (id) => {
-    const noteToEdit = notes.find((note) => note.id === id);
-    if (noteToEdit) {
-      setNewNote({
-        id: noteToEdit.id,
-        title: noteToEdit.title,
-        content: noteToEdit.content,
-        tag: noteToEdit.tag,
-      });
-      setSelectedTag(noteToEdit.tag);
-    }
-  };
-
-  const handleSave = () => {
-    if (
-      !newNote.title.trim() ||
-      !newNote.content.trim() ||
-      !newNote?.tag.trim()
-    ) {
-      return;
-    }
-
-    if (newNote.id) {
-      axios
-        .put(`/notes/${newNote.id}`, {
-          title: newNote.title,
-          content: newNote.content,
-          tag: newNote.tag,
-        })
-        .then((res) => {
-          const updatedNotes = notes.map((note) =>
-            note.id === newNote.id ? res.data : note
-          );
-          setNotes(updatedNotes);
-          //reset newNote
-          setNewNote({ id: null, title: "", content: "", tag: "" });
-          setSelectedTag("");
-        })
-        .catch((err) => {
-          console.error("Error updating note:", err);
-        });
-    } else {
-      axios
-        .post("/notes", {
-          title: newNote.title,
-          content: newNote.content,
-          tag: newNote.tag,
-        })
-        .then((res) => {
-          setNotes([...notes, res.data]);
-          //reset newNote
-          setNewNote({ title: "", content: "", tag: "" });
-          setSelectedTag("");
-        })
-        .catch((err) => {
-          console.error("Error creating note:", err);
-        });
-    }
-  };
-
-  const deleteHandler = (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete? This action is not reversible."
-    );
-    if (!confirmDelete) return;
-
-    axios
-      .delete(`/notes/${id}`)
-      .then(() => {
-        const updatedNotes = notes.filter((note) => note.id !== id);
-        setNotes(updatedNotes);
-      })
-      .catch((err) => {
-        console.error("Error deleting note:", err);
-      });
-  };
-  const handleLogout = () => {
-    sessionStorage.removeItem("currentUser");
-    setUser(null);
-  };
   if (!user) {
-    return <AuthForm onLogin={setUser} />;
+    return <AuthForm onLogin={login} />;
   }
 
   return (
     <>
-      <Header />
-      <button
-        onClick={handleLogout}
-        style={{
-          position: "fixed",
-          top: "5px",
-          right: "10px",
-          padding: "10px 20px",
-          backgroundColor: "#d1d5db",
-          color: "#fff",
-          border: "none",
-          borderRadius: "5px",
-          fontSize: "16px",
-          cursor: "pointer",
-          transition: "all 0.3s ease",
-        }}
-        onMouseEnter={(e) => {
-          e.target.style.backgroundColor = "rgb(173, 78, 91)";
-        }}
-        onMouseLeave={(e) => {
-          e.target.style.backgroundColor = "#d1d5db";
-        }}
-      >
-        Log Out
-      </button>
-      <div className="app-container">
-        <CreateNote
-          handleInputChange={handleInputChange}
-          handleSave={handleSave}
-          newNote={newNote}
-          handleTagChange={handleTagChange}
-          selectedTag={selectedTag}
-        />
-        <SideContainer
-          notesArr={notes}
-          deleteHandler={deleteHandler}
-          editHandler={editHandler}
-          clickHandler={clickHandler}
-          activeNoteId={activeNoteId}
-          filteredNotes={filteredNotes}
-          selectedTag={selectedTag}
-          doubleClickHandler={doubleClickHandler}
-        />
-      </div>
-      {selectedNote && (
+      <Header>
+        <nav className="nav-links">
+          <button
+            className="nav-button"
+            onClick={() => setActiveTab("notes")}
+            style={{ background: activeTab === "notes" ? "#e0e0e0" : "none" }}
+          >
+            Notes
+          </button>
+          <button
+            className="nav-button"
+            onClick={() => setActiveTab("createNote")}
+            style={{
+              background: activeTab === "createNote" ? "#e0e0e0" : "none",
+            }}
+          >
+            Create a note
+          </button>
+          <SearchBar
+            searchText={searchText}
+            setSearchText={setSearchText}
+            filteredNotes={notesState.filteredNotes}
+            setActiveTab={setActiveTab}
+            showSuggestions={showSuggestions}
+            setShowSuggestions={setShowSuggestions}
+          />
+        </nav>
+
+        <Button text="Log out" className="log-out-btn" onClick={logout} />
+      </Header>
+
+      {notesState.loading ? (
+        <div style={{ textAlign: "center", margin: "2rem" }}>
+          <span>Loading notes...</span>
+        </div>
+      ) : (
         <>
-          <div className="modal-overlay"></div>
-          <div className="note-modal">
-            <h2>{selectedNote.title}</h2>
-            <p>{selectedNote.content}</p>
-            <button onClick={() => setSelectedNote(null)}>Close</button>
+          {activeTab === "notes" ? (
+            <Notes
+              deleteHandler={notesState.deleteHandler}
+              clickHandler={notesState.clickHandler}
+              editHandler={(id) => {
+                setActiveTab("createNote");
+                notesState.editHandler(id);
+              }}
+              filteredNotes={notesState.filteredNotes}
+              doubleClickHandler={notesState.doubleClickHandler}
+            />
+          ) : (
+            <CreateNote
+              handleInputChange={notesState.handleInputChange}
+              handleSave={() =>
+                notesState.handleSave((id) => setActiveTab("notes"))
+              }
+              newNote={notesState.newNote}
+              handleTagChange={notesState.handleTagChange}
+              selectedTag={notesState.selectedTag}
+              isEditing={notesState.isEditing}
+            />
+          )}
+        </>
+      )}
+      {notesState.selectedNote && (
+        <>
+          <div
+            className="modal-overlay"
+            tabIndex={-1}
+            aria-modal="true"
+            role="dialog"
+            onClick={notesState.closeModal}
+            style={{ cursor: "pointer" }}
+          ></div>
+          <div
+            className="note-modal"
+            role="document"
+            tabIndex={0}
+            aria-labelledby="modal-title"
+            aria-describedby="modal-content"
+            onKeyDown={(e) => {
+              if (e.key === "Escape") notesState.closeModal();
+            }}
+            autoFocus
+          >
+            <h2 id="modal-title">{notesState.selectedNote.title}</h2>
+            <p id="modal-content">{notesState.selectedNote.content}</p>
+            <button onClick={notesState.closeModal} autoFocus>
+              Close
+            </button>
           </div>
         </>
       )}
-      <footer>
-        <p>Made with ❤️ by Yours Truly</p>
-        <p>
-          <a href="https://github.com/XiaoweiZhao1010">
-            <span>GitHub</span>
-          </a>
-        </p>
-        <p>
-          <a href="https://www.linkedin.com/in/xiaowei-zhao-0aa97b1bb/">
-            <span>LinkedIn</span>
-          </a>
-        </p>
-        <p>
-          This project is licensed under the MIT License — feel free to use,
-          modify, and share it with attribution.
-        </p>
-      </footer>
+      <Footer />
     </>
   );
 }
-export default App;

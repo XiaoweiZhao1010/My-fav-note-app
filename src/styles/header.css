@@ -1,0 +1,42 @@
+.log-out-btn {
+  background: none;
+  color: #cb7474;
+  font-size: 20px;
+  cursor: pointer;
+  margin-bottom: 30px;
+  transition: all 0.3s ease;
+}
+.log-out-btn:hover {
+  background-color: bisque;
+}
+
+.nav-links {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 1rem;
+}
+.nav-button {
+  background: none;
+  font-size: 1.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: black;
+}
+.nav-button:hover {
+  background-color: bisque;
+  border-radius: 10px;
+}
+.search-input {
+  max-width: 300px;
+  padding: 10px 14px;
+  font-size: 16px;
+  border: 1px solid #6f3d3d;
+  border-radius: 6px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-input:focus {
+  border-color: #07274c; /* highlight blue */
+  box-shadow: 0 0 4px rgba(74, 144, 226, 0.4);
+}

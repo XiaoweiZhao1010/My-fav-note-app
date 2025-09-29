@@ -1,5 +1,5 @@
-import src from "../assets/download.png";
+import saveImg from "../assets/download.png";
 
 export default function AddIcon() {
-  return <img src={src} alt="Save" />;
+  return <img src={saveImg} alt="Save" className="save-icon" />;
 }

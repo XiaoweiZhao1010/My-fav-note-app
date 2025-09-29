@@ -1,7 +1,8 @@
-export default function Header() {
+export default function Header({ children }) {
   return (
-    <header>
-      <h1 className="header">📲 My Fav Note App</h1>
+    <header className="sticky-header">
+      <h1>📔</h1>
+      {children}
     </header>
   );
 }
