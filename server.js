@@ -1,36 +1,37 @@
-const express = require("express");
+import express from "express";
+import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
+import pool from "./note-app-backend/db.js";
+import authRoutes from "./note-app-backend/routes/authRoutes.js";
+import noteRoutes from "./note-app-backend/routes/noteRoutes.js";
+import dotenv from "dotenv";
+dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
-const cors = require("cors");
-const path = require("path");
-require("dotenv").config();
+app.use(cors());
+app.use(express.json());
 
-const pool = require("./note-app-backend/db"); // Import the database connection pool
-const authRoutes = require("./note-app-backend/routes/authRoutes"); // Import your auth routes
-const noteRoutes = require("./note-app-backend/routes/noteRoutes"); // Import your note routes
-
+// Connect to DB
 pool
   .connect()
-  .then(() => console.log("Connected to PostgreSQL database"))
-  .catch((err) => console.error("Error connecting to PostgreSQL:", err));
-app.use(cors());
-app.use((req, res, next) => {
-  console.log(`[DEBUG] ${req.method} ${req.path}`);
-  next();
-});
-app.use(express.json()); // Allows JSON in requests
-app.use(express.static(path.join(__dirname, "client/build")));
-app.use("/api/auth", authRoutes); // Use the auth routes
-app.use("/api/notes", noteRoutes); // Use the note routes
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "client/build")));
+  .then(() => console.log("Connected to PostgreSQL"))
+  .catch((err) => console.error(err));
 
+// API routes
+app.use("/api/auth", authRoutes);
+app.use("/api/notes", noteRoutes);
+
+// Serve frontend in production
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "client/dist")));
   app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "client/build", "index.html"));
+    res.sendFile(path.join(__dirname, "client/dist", "index.html"));
   });
 }
-app.get("/", (req, res) => {
-  res.send("Hello from your Note App backend!");
-});
+
 const PORT = process.env.PORT || 5050;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-console.log("App started");
