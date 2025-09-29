@@ -7,6 +7,7 @@ import Header from "./components/Header";
 import SearchBar from "./components/SearchBar";
 import Button from "./ui/Button";
 import Notes from "./components/Notes";
+import AuthForm from "./components/AuthForm";
 import Footer from "./components/Footer";
 import CreateNote from "./components/CreateNote";
 
